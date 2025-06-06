@@ -1,0 +1,129 @@
+# Multi-Platform Account Checker - Technical Plan
+
+## Technology Stack
+- **Core Platform**: .NET 6+ (Windows-focused)
+- **GUI Framework**: WPF with custom branding
+- **HTTP Client**: HttpClient with Polly retries
+- **Proxy Sources**: Luminati, Smartproxy, GeoSurf
+- **CAPTCHA Services**: 
+  - CapSolver (primary)
+  - AnyCaptcha (secondary)
+  - 2Captcha (fallback)
+  - Local OCR (last resort)
+- **Concurrency**: Async/Await with configurable parallelism
+- **Storage**: JSON files with service-based organization
+
+## System Architecture
+```mermaid
+graph TD
+    A[GUI Layer] --> B[Core Services]
+    A -->|Scrape Proxies| C[Proxy Scraper]
+    A -->|Solve CAPTCHAs| D[Premium CAPTCHA]
+    B --> E[Proxy Manager]
+    B --> F[Account Checkers]
+    F --> G[Site-Specific Modules]
+    B --> H[Result Storage]
+    C --> E
+    D --> F
+```
+
+## Key Features
+
+### Enhanced Proxy Management UI
+```mermaid
+graph TD
+    A[Current Proxy UI] --> B[Enhanced Statistics]
+    A --> C[Scraping Controls]
+    A --> D[Advanced Testing]
+    A --> E[Geo Visualization]
+    
+    B --> B1[Response Time Metrics]
+    B --> B2[Success Rate Charts]
+    B --> B3[Historical Performance]
+    
+    C --> C1[Scrape Button]
+    C --> C2[Source Selection]
+    C --> C3[Scrape Settings]
+    
+    D --> D1[Concurrent Tests]
+    D --> D2[Test Endpoints]
+    D --> D3[Detailed Reports]
+    
+    E --> E1[Country Distribution]
+    E --> E2[City Breakdown]
+    E --> E3[Proxy Type Icons]
+```
+
+#### UI Enhancements:
+1. **Statistics Panel**
+   - Response time gauges (avg, min, max)
+   - Success rate percentage with sparkline chart
+   - Proxy uptime history graph
+   - Sorting options for proxy list
+
+2. **Scraping Controls**
+   - "Scrape Proxies" button with dropdown for sources
+   - Scraping progress indicator
+   - Auto-test toggle for new proxies
+   - Whitelist/blacklist management
+
+3. **Advanced Testing**
+   - Custom test URL input
+   - Concurrent test threads slider
+   - Detailed test reports with timing breakdown
+   - Export test results option
+
+4. **Geographic Visualization**
+   - World map showing proxy locations
+   - Country/city distribution pie charts
+   - Filter by geographic region
+
+5. **Proxy List**
+   - Color coding by response time
+   - Icons for proxy types (HTTP/SOCKS)
+   - Quick actions (retest, remove, favorite)
+   - Bulk operations menu
+
+### CAPTCHA Handling
+- Multi-service integration
+- Automatic service selection
+- Balance monitoring
+- Failover handling
+- Statistics tracking
+
+### Account Validation
+- Multi-threaded checking (configurable threads)
+- Site-specific modules for:
+  - Marktplaats.nl
+  - Bol.com  
+  - Zalando
+  - Telenet
+  - Vodafone
+  - Tele2
+- Automatic retry logic
+- Real-time results display
+
+## Implementation Phases
+
+1. **Core Infrastructure (Week 1-2)**
+   - Project setup with .NET 6
+   - Basic WPF framework
+   - Proxy manager foundation
+   - HTTP client implementation
+
+2. **Account Checking (Week 3-4)**
+   - Site module development
+   - CAPTCHA integration
+   - Basic result storage
+   - Proxy scraping functionality
+
+3. **UI Enhancements (Week 5)**
+   - Statistics visualization
+   - Proxy scraping controls
+   - Advanced testing panels
+   - Geographic visualization
+
+4. **Optimization (Week 6)**
+   - Performance tuning
+   - Error handling
+   - User documentation
