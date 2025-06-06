@@ -77,20 +77,78 @@ export class MemStorage implements IStorage {
       activities: 1,
     };
 
-    // Initialize system stats
+    // Initialize system stats with some default data
     this.systemStats = {
       id: 1,
-      totalAccounts: 0,
-      validAccounts: 0,
-      invalidAccounts: 0,
-      activeProxies: 0,
-      activeChecks: 0,
-      queueSize: 0,
-      proxiesOnline: 0,
-      totalProxies: 0,
-      successRate: "0%",
+      totalAccounts: 2847,
+      validAccounts: 2486,
+      invalidAccounts: 361,
+      activeProxies: 89,
+      activeChecks: 24,
+      queueSize: 156,
+      proxiesOnline: 89,
+      totalProxies: 120,
+      successRate: "87.3%",
       timestamp: new Date(),
     };
+    
+    // Initialize with some sample data
+    this.initializeDefaultData();
+  }
+
+  private initializeDefaultData() {
+    // Add some initial proxy data
+    const sampleProxies = [
+      { host: "proxy1.example.com", port: 8080, type: "http" as const, isWorking: true },
+      { host: "proxy2.example.com", port: 1080, type: "socks5" as const, isWorking: true },
+      { host: "proxy3.example.com", port: 8080, type: "http" as const, isWorking: false },
+    ];
+    
+    // Initialize synchronously to avoid async constructor issues
+    setTimeout(async () => {
+      for (const proxy of sampleProxies) {
+        await this.createProxy(proxy);
+      }
+      
+      // Add some initial activities
+      const sampleActivities = [
+        { message: "Account checking started for Marktplaats list", type: "info" as const },
+        { message: "Successfully validated 156 accounts", type: "success" as const },
+        { message: "Proxy test completed - 89/120 working", type: "info" as const },
+      ];
+      
+      for (const activity of sampleActivities) {
+        await this.addActivity(activity);
+      }
+      
+      // Add sample account lists
+      const sampleLists = [
+        {
+          name: "Marktplaats Accounts",
+          platform: "marktplaats.nl",
+          totalAccounts: 1500,
+          validAccounts: 1320,
+          invalidAccounts: 180,
+          status: "completed" as const,
+          progress: 100,
+          accounts: ["user1@example.com:pass1", "user2@example.com:pass2"]
+        },
+        {
+          name: "Bol.com Accounts", 
+          platform: "bol.com",
+          totalAccounts: 847,
+          validAccounts: 766,
+          invalidAccounts: 81,
+          status: "checking" as const,
+          progress: 65,
+          accounts: ["user3@example.com:pass3", "user4@example.com:pass4"]
+        }
+      ];
+      
+      for (const list of sampleLists) {
+        await this.createAccountList(list);
+      }
+    }, 0);
   }
 
   // Users
