@@ -99,9 +99,9 @@ export class MemStorage implements IStorage {
   private initializeDefaultData() {
     // Add some initial proxy data
     const sampleProxies = [
-      { host: "proxy1.example.com", port: 8080, type: "http" as const, isWorking: true },
-      { host: "proxy2.example.com", port: 1080, type: "socks5" as const, isWorking: true },
-      { host: "proxy3.example.com", port: 8080, type: "http" as const, isWorking: false },
+      { host: "proxy1.example.com", port: 8080, type: "http", source: "manual", isWorking: true },
+      { host: "proxy2.example.com", port: 1080, type: "socks5", source: "manual", isWorking: true },
+      { host: "proxy3.example.com", port: 8080, type: "http", source: "manual", isWorking: false },
     ];
     
     // Initialize synchronously to avoid async constructor issues
@@ -112,9 +112,9 @@ export class MemStorage implements IStorage {
       
       // Add some initial activities
       const sampleActivities = [
-        { message: "Account checking started for Marktplaats list", type: "info" as const },
-        { message: "Successfully validated 156 accounts", type: "success" as const },
-        { message: "Proxy test completed - 89/120 working", type: "info" as const },
+        { message: "Account checking started for Marktplaats list", type: "info" },
+        { message: "Successfully validated 156 accounts", type: "success" },
+        { message: "Proxy test completed - 89/120 working", type: "info" },
       ];
       
       for (const activity of sampleActivities) {
@@ -129,7 +129,7 @@ export class MemStorage implements IStorage {
           totalAccounts: 1500,
           validAccounts: 1320,
           invalidAccounts: 180,
-          status: "completed" as const,
+          status: "completed",
           progress: 100,
           accounts: ["user1@example.com:pass1", "user2@example.com:pass2"]
         },
@@ -139,7 +139,7 @@ export class MemStorage implements IStorage {
           totalAccounts: 847,
           validAccounts: 766,
           invalidAccounts: 81,
-          status: "checking" as const,
+          status: "checking",
           progress: 65,
           accounts: ["user3@example.com:pass3", "user4@example.com:pass4"]
         }
