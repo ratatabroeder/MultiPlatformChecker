@@ -80,6 +80,10 @@ export class MemStorage implements IStorage {
     // Initialize system stats
     this.systemStats = {
       id: 1,
+      totalAccounts: 0,
+      validAccounts: 0,
+      invalidAccounts: 0,
+      activeProxies: 0,
       activeChecks: 0,
       queueSize: 0,
       proxiesOnline: 0,

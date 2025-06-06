@@ -21,10 +21,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const stats = await storage.getLatestStats();
       const proxies = await storage.getAllProxies();
       const workingProxies = proxies.filter(p => p.isWorking);
+      const accountLists = await storage.getAllAccountLists();
+      const checkResults = await storage.getCheckResults();
+      
+      // Calculate totals from actual data
+      const totalAccounts = accountLists.reduce((sum, list) => sum + (list.totalAccounts || 0), 0);
+      const validAccounts = accountLists.reduce((sum, list) => sum + (list.validAccounts || 0), 0);
+      const invalidAccounts = accountLists.reduce((sum, list) => sum + (list.invalidAccounts || 0), 0);
+      const successRate = totalAccounts > 0 ? ((validAccounts / totalAccounts) * 100).toFixed(1) + "%" : "0%";
       
       const updatedStats = await storage.updateStats({
+        totalAccounts,
+        validAccounts,
+        invalidAccounts,
+        activeProxies: workingProxies.length,
         proxiesOnline: workingProxies.length,
         totalProxies: proxies.length,
+        successRate,
       });
       
       res.json(updatedStats);

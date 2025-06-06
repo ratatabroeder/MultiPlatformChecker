@@ -50,6 +50,10 @@ export const checkResults = pgTable("check_results", {
 
 export const systemStats = pgTable("system_stats", {
   id: serial("id").primaryKey(),
+  totalAccounts: integer("total_accounts").default(0),
+  validAccounts: integer("valid_accounts").default(0),
+  invalidAccounts: integer("invalid_accounts").default(0),
+  activeProxies: integer("active_proxies").default(0),
   activeChecks: integer("active_checks").default(0),
   queueSize: integer("queue_size").default(0),
   proxiesOnline: integer("proxies_online").default(0),

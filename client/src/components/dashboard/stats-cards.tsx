@@ -7,10 +7,14 @@ interface StatsCardsProps {
 }
 
 export function StatsCards({ stats }: StatsCardsProps) {
+  if (!stats) {
+    return <div>Loading stats...</div>;
+  }
+
   const cards = [
     {
       title: "Total Accounts",
-      value: (stats?.totalAccounts || 0).toLocaleString(),
+      value: (stats.totalAccounts || 0).toLocaleString(),
       icon: Users,
       iconColor: "text-blue-400",
       bgColor: "bg-blue-500/20",
@@ -20,27 +24,27 @@ export function StatsCards({ stats }: StatsCardsProps) {
     },
     {
       title: "Valid Accounts",
-      value: (stats?.validAccounts || 0).toLocaleString(),
+      value: (stats.validAccounts || 0).toLocaleString(),
       icon: CheckCircle,
       iconColor: "text-green-400",
       bgColor: "bg-green-500/20",
-      change: stats?.successRate || "0%",
+      change: stats.successRate || "0%",
       changeLabel: "success rate",
       changePositive: true,
     },
     {
       title: "Invalid Accounts",
-      value: (stats?.invalidAccounts || 0).toLocaleString(),
+      value: (stats.invalidAccounts || 0).toLocaleString(),
       icon: XCircle,
       iconColor: "text-red-400",
       bgColor: "bg-red-500/20",
-      change: `${(100 - parseFloat(stats?.successRate || "0")).toFixed(1)}%`,
+      change: `${(100 - parseFloat(stats.successRate?.replace('%', '') || "0")).toFixed(1)}%`,
       changeLabel: "failure rate",
       changePositive: false,
     },
     {
       title: "Active Proxies",
-      value: (stats?.activeProxies || 0).toString(),
+      value: (stats.activeProxies || 0).toString(),
       icon: Globe,
       iconColor: "text-blue-400",
       bgColor: "bg-blue-500/20",
