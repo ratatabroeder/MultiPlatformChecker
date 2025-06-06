@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { insertProxySchema, insertAccountListSchema, insertCheckResultSchema, insertActivitySchema } from "@shared/schema";
 import { z } from "zod";
 import multer from "multer";
+import { Request } from "express";
 import { proxyScraper } from "./services/proxy-scraper";
 import { accountChecker } from "./services/account-checker";
 import { setupWebSocket } from "./websocket";
@@ -13,10 +14,6 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
-  
-  // Setup WebSocket
-  const wss = new WebSocketServer({ server: httpServer });
-  setupWebSocket(wss);
 
   // System Stats
   app.get("/api/stats", async (req, res) => {
@@ -144,14 +141,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/account-lists/upload", upload.single('file'), async (req, res) => {
+  app.post("/api/account-lists/upload", upload.single('file'), async (req: any, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
 
       const content = req.file.buffer.toString('utf-8');
-      const accounts = content.split('\n').filter(line => line.trim());
+      const accounts = content.split('\n').filter((line: string) => line.trim());
       const { name, platform } = req.body;
 
       const list = await storage.createAccountList({

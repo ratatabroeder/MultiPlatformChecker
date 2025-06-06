@@ -125,6 +125,10 @@ export class MemStorage implements IStorage {
       id,
       createdAt: new Date(),
       lastTested: null,
+      country: insertProxy.country || null,
+      city: insertProxy.city || null,
+      isWorking: insertProxy.isWorking || false,
+      responseTime: insertProxy.responseTime || null,
     };
     this.proxies.set(id, proxy);
     return proxy;
@@ -168,6 +172,12 @@ export class MemStorage implements IStorage {
       id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      status: insertList.status || 'pending',
+      progress: insertList.progress || 0,
+      totalAccounts: insertList.totalAccounts || 0,
+      validAccounts: insertList.validAccounts || 0,
+      invalidAccounts: insertList.invalidAccounts || 0,
+      accounts: insertList.accounts || [],
     };
     this.accountLists.set(id, list);
     return list;
@@ -202,6 +212,11 @@ export class MemStorage implements IStorage {
       ...insertResult,
       id,
       checkedAt: new Date(),
+      listId: insertResult.listId || null,
+      responseTime: insertResult.responseTime || null,
+      isValid: insertResult.isValid || false,
+      errorMessage: insertResult.errorMessage || null,
+      proxyUsed: insertResult.proxyUsed || null,
     };
     this.checkResults.set(id, result);
     return result;
