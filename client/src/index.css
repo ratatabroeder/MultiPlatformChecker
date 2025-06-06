@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 240 10% 3.9%; /* #0f172a */
+  --foreground: 0 0% 98%; /* #fafafa */
+  --muted: 240 3.7% 15.9%; /* #1e293b */
+  --muted-foreground: 240 5% 64.9%; /* #94a3b8 */
+  --popover: 240 10% 3.9%; /* #0f172a */
+  --popover-foreground: 0 0% 98%; /* #fafafa */
+  --card: 240 5.9% 10%; /* #1e293b */
+  --card-foreground: 0 0% 98%; /* #fafafa */
+  --border: 240 3.7% 15.9%; /* #334155 */
+  --input: 240 3.7% 15.9%; /* #334155 */
+  --primary: 217 91% 60%; /* #3b82f6 */
+  --primary-foreground: 0 0% 98%; /* #fafafa */
+  --secondary: 240 3.7% 15.9%; /* #334155 */
+  --secondary-foreground: 0 0% 98%; /* #fafafa */
+  --accent: 240 3.7% 15.9%; /* #334155 */
+  --accent-foreground: 0 0% 98%; /* #fafafa */
+  --destructive: 0 62.8% 30.6%; /* #dc2626 */
+  --destructive-foreground: 0 0% 98%; /* #fafafa */
+  --ring: 240 4.9% 83.9%; /* #e2e8f0 */
+  --radius: 0.5rem;
+  
+  /* Chart colors */
+  --chart-1: 217 91% 60%; /* #3b82f6 */
+  --chart-2: 142 76% 36%; /* #10b981 */
+  --chart-3: 262 83% 58%; /* #a855f7 */
+  --chart-4: 43 96% 56%; /* #f59e0b */
+  --chart-5: 0 84% 60%; /* #ef4444 */
+  
+  /* Custom colors for dark theme */
+  --dark-50: 210 40% 98%;
+  --dark-100: 210 40% 96%;
+  --dark-200: 214 32% 91%;
+  --dark-300: 213 27% 84%;
+  --dark-400: 215 20% 65%;
+  --dark-500: 215 16% 47%;
+  --dark-600: 215 19% 35%;
+  --dark-700: 215 25% 27%;
+  --dark-800: 217 33% 17%;
+  --dark-900: 222 84% 5%;
+}
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --card: 240 5.9% 10%;
+  --card-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 240 4.9% 83.9%;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+  
+  /* Dark theme by default */
+  html {
+    @apply dark;
+  }
+}
+
+@layer components {
+  .animate-pulse-slow {
+    animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: .7;
+    }
+  }
+}

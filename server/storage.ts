@@ -1,0 +1,244 @@
+import { 
+  users, 
+  proxies, 
+  accountLists, 
+  checkResults, 
+  systemStats, 
+  activities,
+  type User, 
+  type InsertUser,
+  type Proxy,
+  type InsertProxy,
+  type AccountList,
+  type InsertAccountList,
+  type CheckResult,
+  type InsertCheckResult,
+  type SystemStats,
+  type Activity,
+  type InsertActivity
+} from "@shared/schema";
+
+export interface IStorage {
+  // Users
+  getUser(id: number): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+
+  // Proxies
+  getAllProxies(): Promise<Proxy[]>;
+  getWorkingProxies(): Promise<Proxy[]>;
+  getProxy(id: number): Promise<Proxy | undefined>;
+  createProxy(proxy: InsertProxy): Promise<Proxy>;
+  updateProxy(id: number, updates: Partial<Proxy>): Promise<Proxy | undefined>;
+  deleteProxy(id: number): Promise<boolean>;
+  bulkCreateProxies(proxies: InsertProxy[]): Promise<Proxy[]>;
+
+  // Account Lists
+  getAllAccountLists(): Promise<AccountList[]>;
+  getAccountList(id: number): Promise<AccountList | undefined>;
+  createAccountList(list: InsertAccountList): Promise<AccountList>;
+  updateAccountList(id: number, updates: Partial<AccountList>): Promise<AccountList | undefined>;
+  deleteAccountList(id: number): Promise<boolean>;
+
+  // Check Results
+  getCheckResults(listId?: number): Promise<CheckResult[]>;
+  createCheckResult(result: InsertCheckResult): Promise<CheckResult>;
+  getResultsByPlatform(platform: string): Promise<CheckResult[]>;
+
+  // System Stats
+  getLatestStats(): Promise<SystemStats | undefined>;
+  updateStats(stats: Partial<SystemStats>): Promise<SystemStats>;
+
+  // Activities
+  getRecentActivities(limit?: number): Promise<Activity[]>;
+  addActivity(activity: InsertActivity): Promise<Activity>;
+}
+
+export class MemStorage implements IStorage {
+  private users: Map<number, User>;
+  private proxies: Map<number, Proxy>;
+  private accountLists: Map<number, AccountList>;
+  private checkResults: Map<number, CheckResult>;
+  private systemStats: SystemStats;
+  private activities: Map<number, Activity>;
+  private currentId: { [key: string]: number };
+
+  constructor() {
+    this.users = new Map();
+    this.proxies = new Map();
+    this.accountLists = new Map();
+    this.checkResults = new Map();
+    this.activities = new Map();
+    this.currentId = {
+      users: 1,
+      proxies: 1,
+      accountLists: 1,
+      checkResults: 1,
+      activities: 1,
+    };
+
+    // Initialize system stats
+    this.systemStats = {
+      id: 1,
+      activeChecks: 0,
+      queueSize: 0,
+      proxiesOnline: 0,
+      totalProxies: 0,
+      successRate: "0%",
+      timestamp: new Date(),
+    };
+  }
+
+  // Users
+  async getUser(id: number): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(user => user.username === username);
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = this.currentId.users++;
+    const user: User = { ...insertUser, id };
+    this.users.set(id, user);
+    return user;
+  }
+
+  // Proxies
+  async getAllProxies(): Promise<Proxy[]> {
+    return Array.from(this.proxies.values());
+  }
+
+  async getWorkingProxies(): Promise<Proxy[]> {
+    return Array.from(this.proxies.values()).filter(proxy => proxy.isWorking);
+  }
+
+  async getProxy(id: number): Promise<Proxy | undefined> {
+    return this.proxies.get(id);
+  }
+
+  async createProxy(insertProxy: InsertProxy): Promise<Proxy> {
+    const id = this.currentId.proxies++;
+    const proxy: Proxy = {
+      ...insertProxy,
+      id,
+      createdAt: new Date(),
+      lastTested: null,
+    };
+    this.proxies.set(id, proxy);
+    return proxy;
+  }
+
+  async updateProxy(id: number, updates: Partial<Proxy>): Promise<Proxy | undefined> {
+    const existing = this.proxies.get(id);
+    if (!existing) return undefined;
+
+    const updated = { ...existing, ...updates };
+    this.proxies.set(id, updated);
+    return updated;
+  }
+
+  async deleteProxy(id: number): Promise<boolean> {
+    return this.proxies.delete(id);
+  }
+
+  async bulkCreateProxies(insertProxies: InsertProxy[]): Promise<Proxy[]> {
+    const proxies: Proxy[] = [];
+    for (const insertProxy of insertProxies) {
+      const proxy = await this.createProxy(insertProxy);
+      proxies.push(proxy);
+    }
+    return proxies;
+  }
+
+  // Account Lists
+  async getAllAccountLists(): Promise<AccountList[]> {
+    return Array.from(this.accountLists.values());
+  }
+
+  async getAccountList(id: number): Promise<AccountList | undefined> {
+    return this.accountLists.get(id);
+  }
+
+  async createAccountList(insertList: InsertAccountList): Promise<AccountList> {
+    const id = this.currentId.accountLists++;
+    const list: AccountList = {
+      ...insertList,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.accountLists.set(id, list);
+    return list;
+  }
+
+  async updateAccountList(id: number, updates: Partial<AccountList>): Promise<AccountList | undefined> {
+    const existing = this.accountLists.get(id);
+    if (!existing) return undefined;
+
+    const updated = { ...existing, ...updates, updatedAt: new Date() };
+    this.accountLists.set(id, updated);
+    return updated;
+  }
+
+  async deleteAccountList(id: number): Promise<boolean> {
+    // Also delete related check results
+    const results = Array.from(this.checkResults.values()).filter(r => r.listId === id);
+    results.forEach(r => this.checkResults.delete(r.id));
+    
+    return this.accountLists.delete(id);
+  }
+
+  // Check Results
+  async getCheckResults(listId?: number): Promise<CheckResult[]> {
+    const results = Array.from(this.checkResults.values());
+    return listId ? results.filter(r => r.listId === listId) : results;
+  }
+
+  async createCheckResult(insertResult: InsertCheckResult): Promise<CheckResult> {
+    const id = this.currentId.checkResults++;
+    const result: CheckResult = {
+      ...insertResult,
+      id,
+      checkedAt: new Date(),
+    };
+    this.checkResults.set(id, result);
+    return result;
+  }
+
+  async getResultsByPlatform(platform: string): Promise<CheckResult[]> {
+    return Array.from(this.checkResults.values()).filter(r => r.platform === platform);
+  }
+
+  // System Stats
+  async getLatestStats(): Promise<SystemStats | undefined> {
+    return this.systemStats;
+  }
+
+  async updateStats(updates: Partial<SystemStats>): Promise<SystemStats> {
+    this.systemStats = { ...this.systemStats, ...updates, timestamp: new Date() };
+    return this.systemStats;
+  }
+
+  // Activities
+  async getRecentActivities(limit: number = 10): Promise<Activity[]> {
+    const activities = Array.from(this.activities.values())
+      .sort((a, b) => new Date(b.timestamp!).getTime() - new Date(a.timestamp!).getTime())
+      .slice(0, limit);
+    return activities;
+  }
+
+  async addActivity(insertActivity: InsertActivity): Promise<Activity> {
+    const id = this.currentId.activities++;
+    const activity: Activity = {
+      ...insertActivity,
+      id,
+      timestamp: new Date(),
+    };
+    this.activities.set(id, activity);
+    return activity;
+  }
+}
+
+export const storage = new MemStorage();
